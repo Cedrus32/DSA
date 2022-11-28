@@ -27,3 +27,14 @@ function printFibI(n) {
 }
 
 // print fib array recursively
+
+function printFibR2(n) {
+    if (n === 0) {
+        return [0];
+    }
+    if (n === 1) {
+        return [0, 1];
+    }
+    let array = printFibR(n - 1);
+    return [...array, array[n-1] + array[n-2]];
+}
