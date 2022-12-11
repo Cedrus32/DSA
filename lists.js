@@ -1,40 +1,20 @@
+// ! find way to reuse code?
+// ! make values private?
+// * use recursion when more efficient
 // ! wrap methods in try-catch for error handling -- many methods do not consider inputs outside bounds of list
-// ! find way to reuse code
-// ! use recursion when possible
 // ! make into module, so that class List can be exported into other projects
 
 class List {
     // container for the list itself
     constructor(head, ...data) {
         this.head = new Node(head);
-        this.size = 1;
+        this.size = 0;
+        if (head !== undefined) {
+            this.size++;
+        }
         if ([...data].length > 0) {
             [...data].forEach(item => this.append(item));
         }
-    }
-
-    // * append to end of list
-    append(value) {
-        const getLastNode = (node) => {
-            let last;
-            if (node.next !== null) {
-                last = getLastNode(node.next);
-            } else {
-                last = node;
-            }
-            return last;
-        }
-        let lastNode = getLastNode(this.head);
-        lastNode.next = new Node(value);
-        this.size++;
-    }
-
-    // * prepend to start of list
-    prepend(value) {
-        let newNode = new Node(value);
-        newNode.next = this.head;
-        this.head = newNode;
-        this.size++;
     }
 
     // * return size of list (number of nodes)
@@ -51,44 +31,165 @@ class List {
 
     // * return tail of list
     getTail() {
-        const getTail = (node) => {
-            let tail;
-            if (node.next !== null) {
-                tail = getTail(node.next);
-            } else {
-                tail = node;
-            }
-            return tail;
+        let i = 0;
+        let tailNode = this.head;
+        while (i < this.size - 1) {
+            tailNode = tailNode.next;
+            i++;
         }
-        let tailNode = getTail(this.head);
         console.log(tailNode);
         return tailNode;
     }
 
     // * return node at given index
-    getAtIndex(targetIndex) {
+    getNodeAt(targetIndex) {
+        // ^ errors: index out of range, index not an integer
         if (targetIndex < 0) {
             targetIndex += this.size;
-            console.log(targetIndex);
         }
-        if (targetIndex >= this.size) {
-            let error = 'index out of range';
-            console.log(error);
-            return error;
-        } else {
-            let currentIndex = 0;
-            let node = this.head;
-            while (currentIndex < targetIndex) {
-                node = node.next;
-                currentIndex++;
+        let i = 0;
+        let targetNode = this.head;
+        while (i < targetIndex) {
+            targetNode = targetNode.next;
+            i++;
+        }
+        console.log(targetNode);
+        return targetNode;
+    }
+
+    // * return index of passed value
+    getIndexOf(value) {
+        // ^ errors: value does not exist in list
+        const getIndex = (i, targetValue, node) => {
+            let targetIndex;
+            if (node.data === targetValue) {
+                targetIndex = i;
+            } else {
+                i++;
+                targetIndex = getIndex(i, targetValue, node.next);
             }
-            console.log(node);
-            return node;
+            return targetIndex;
+        }
+        let targetIndex = getIndex(0, value, this.head);
+        console.log(targetIndex);
+        return targetIndex;
+    }
+
+    // * return true if passed value is contained in list
+    contains(value) {
+        const checkValue = (targetValue, node) => {
+            let contains;
+            if (node.data === targetValue) {
+                contains = true;
+            } else if (node.next === null) {
+                contains = false;
+            } else {
+                contains = checkValue(targetValue, node.next);
+            }
+            return contains;
+        }
+        let contains = checkValue(value, this.head);
+        console.log(contains);
+        return contains;
+    }
+
+    // * append to end of list
+    append(value) {
+        // ^ reuse getTail()
+        const getTailNode = () => {
+            let i = 0;
+            let tailNode = this.head;
+            while (i < this.size - 1) {
+                tailNode = tailNode.next;
+                i++;
+            }
+            return tailNode;
+        }
+        if (this.head.data === null) {
+            this.head.data = value;
+            this.size++;
+        } else {
+            let tailNode = getTailNode();
+            tailNode.next = new Node(value);
+            this.size++;
+        }
+    }
+
+    // * prepend to start of list
+    prepend(value) {
+        if (this.head.data === null) {
+            this.head.data = value;
+            this.size++;
+        } else {
+            let newNode = new Node(value);
+            newNode.next = this.head;
+            this.head = newNode;
+            this.size++;
+        }
+    }
+
+    // * insert new node at given index
+    insertAt(value, index) {
+        // ^ errors: index out of range, index is not an integer
+        const traverseToTarget = (i, targetIndex, node) => {
+            let previousNode;
+            if (i === targetIndex - 1) {
+                previousNode = node;
+            } else {
+                i++;
+                previousNode = traverseToTarget(i, targetIndex, node.next);
+            }
+            return previousNode;
+        }
+        let newNode = new Node(value);
+        if (index === 0) {
+            if (this.size === 0) {
+                this.head.data = value;
+            } else {
+                newNode.next = this.head;
+                this.head = newNode;
+            }
+            this.size++;
+        } else {
+            let previousNode = traverseToTarget(0, index, this.head);
+            newNode.next = previousNode.next;
+            previousNode.next = newNode;
+            this.size++;
+        }
+    }
+
+    // * remove node at given index
+    removeAt(index) {
+        // ^ errors: index out of range, index not an integer, head already === null (empty list)
+        const traverseToTarget = (i, targetIndex, node) => {
+            let previousNode;
+            if (i === targetIndex - 1) {
+                previousNode = node;
+            } else {
+                i++;
+                previousNode = traverseToTarget(i, targetIndex, node.next);
+            }
+            return previousNode;
+        }
+        if (index === 0) {
+            if (this.size === 1) {
+                this.head.data = null;
+            } else {
+                let newHead = this.head.next;
+                this.head = newHead;
+            }
+            this.size--;
+        } else {
+            let previousNode = traverseToTarget(0, index, this.head);
+            let newNext = previousNode.next.next;
+            previousNode.next = newNext;
+            this.size--;
         }
     }
 
     // * pop last item from list
     pop() {
+        // ^ errors: head already === null (empty list)
         let lastNode;
         const getNextToLast = (node) => {
             if (node.next.next !== null) {
@@ -99,7 +200,7 @@ class List {
             }
         }
         if (this.size === 1) {
-            this.head = null;
+            this.head.data = null;
             lastNode = this.head;
         } else {
             getNextToLast(this.head);
@@ -110,107 +211,17 @@ class List {
 
     // * shift first item from list
     shift() {
+        // ^ errors: head already === null (empty list)
         let firstNode;
-        firstNode = new Node(this.head.data);
-        this.head = this.head.next;
+        if (this.size === 1) {
+            this.head.data = null;
+            firstNode = this.head;
+        } else {
+            firstNode = new Node(this.head.data);
+            this.head = this.head.next;
+        }
         this.size--;
         return firstNode;
-    }
-
-    // * return true if passed value is contained in list
-    contains(value) {
-        let i = 0;
-        let contains = false;;
-        let node = this.head
-        while (i < this.size) {
-            if (node.data === value) {
-                contains = true;
-                break;
-            } else {
-                node = node.next;
-            }
-            i++;
-        }
-        console.log(contains);
-        return contains;
-    }
-
-    // * return index of passed value
-    getIndexOf(value) {
-        // check if node contains
-        // if yes... return index counter
-        // if no... check next node, increment index counter
-        let i = 0;
-        let node = this.head
-        while (i < this.size) {
-            if (node.data === value) {
-                break;
-            } else {
-                node = node.next;
-                i++;
-            }
-        }
-        console.log(i);
-        return i;
-    }
-
-    // * insert new node at given index
-    insertAt(value, index) {
-        let i = 0;
-        let node = this.head;
-        let previousNode;
-        let nextNode;
-        while (i <= index) {
-            if (i === index - 1) {
-                previousNode = node;
-            } else if (i === index) {
-                nextNode = node;
-                let newNode = new Node(value);
-                newNode.next = nextNode;
-                previousNode.next = newNode;
-            }
-            node = node.next;
-            i++;
-        }
-        this.size++;
-    }
-
-    // * remove node at given index
-    removeAt(index) {
-        let i = 0;
-        if (index === 0) {
-            let nextNode = this.head.next;
-            this.head = nextNode;
-        } else if (index === this.size - 1) {
-            const getNextToLast = (node) => {
-                if (node.next.next !== null) {
-                    getNextToLast(node.next);
-                } else {
-                    node.next = null;
-                }
-            }
-            if (this.size === 1) {
-                this.head = null;
-            } else {
-                getNextToLast(this.head);
-            }
-            this.size --;
-        } else {
-            let node = this.head;
-            let previousNode;
-            let nextNode
-            while (i <= index) {
-                if (i === index - 1) {
-                    previousNode = node;
-                } if (i === index) {
-                    nextNode = node.next;
-                    previousNode.next = nextNode;
-                }
-                node = node.next;
-                i++;
-            }
-        }
-        this.size--;
     }
 
     // * represent list as a string value ( value ) -> ( value ) -> ( value ) -> null
@@ -218,22 +229,24 @@ class List {
         const appendData = (node) => {
             listString += `( ${node.data} ) -> `;
             if (node.next === null) {
-                listString += ' null ';
+                listString += 'null';
             }
         }
         let listString = '';
         let node = this.head;
         let i = 0;
-        while (i < this.size) {
-            console.log(node);
-            appendData(node);
-            node = node.next;
-            i++;
+        if (this.size === 0) {
+            listString = '( null ) -> null'
+        } else {
+            while (i < this.size) {
+                appendData(node);
+                node = node.next;
+                i++;
+            }
         }
         console.log(listString);
         return listString;
     }
-
 }
 
 class Node {
@@ -243,21 +256,23 @@ class Node {
     }
 }
 
-let testList = new List(1, 2, 3, 4, 5);
-// console.log(testList);
-
-// testList.append(6);
-// testList.prepend(0);
-// testList.insertAt(4.5, 5);
-// testList.removeAt(5);
-// let lastNode = testList.pop();
-// let firstNode = testList.shift();
+let testList = new List(1);
 
 // testList.getSize();
 // testList.getHead();
 // testList.getTail();
-// testList.getAtIndex(3);
+// testList.contains(-1);
+// testList.getNodeAt(3);
 // testList.getIndexOf(6);
-// testList.contains(8);
 
-// testList.print();
+// testList.append(6);
+// testList.prepend(0);
+// testList.insertAt(2.5, 2);
+// testList.removeAt(0);
+// let lastNode = testList.pop();
+// console.log(lastNode);
+// let firstNode = testList.shift();
+// console.log(firstNode);
+
+testList.print();
+console.log(testList);
