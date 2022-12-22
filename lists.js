@@ -1,9 +1,3 @@
-// ! find way to reuse code?
-// ! make values private?
-// * use recursion when more efficient
-// ! wrap methods in try-catch for error handling -- many methods do not consider inputs outside bounds of list
-// ! make into module, so that class List can be exported into other projects
-
 class List {
     // container for the list itself
     constructor(head, ...data) {
@@ -19,60 +13,78 @@ class List {
 
     // * return size of list (number of nodes)
     getSize() {
-        console.log(this.size);
         return this.size;
     }
 
     // * return head of list
     getHead() {
-        console.log(this.head);
         return this.head;
     }
 
     // * return tail of list
     getTail() {
-        let i = 0;
         let tailNode = this.head;
-        while (i < this.size - 1) {
-            tailNode = tailNode.next;
-            i++;
+        if (this.size <= 1) {
+            tailNode = this.head;
+        } else {
+            let i = 0;
+            while (i < this.size - 1) {
+                tailNode = tailNode.next;
+                i++;
+            }
         }
-        console.log(tailNode);
         return tailNode;
     }
 
     // * return node at given index
     getNodeAt(targetIndex) {
-        // ^ errors: index out of range, index not an integer
-        if (targetIndex < 0) {
-            targetIndex += this.size;
+        const checkError = (index) => {
+            if (typeof index !== 'number') {
+                return [true, 'getNodeAt() ** ERROR: index not of type Number **'];
+            } else if (index >= this.size) {
+                return [true, 'getNodeAt() ** ERROR: index out of range **'];
+            } else if (index % 1 !== 0) {
+                return [true, 'getNodeAt() ** ERROR: index not whole integer **'];
+            } else {
+                return false;
+            }
         }
-        let i = 0;
-        let targetNode = this.head;
-        while (i < targetIndex) {
-            targetNode = targetNode.next;
-            i++;
+        let error = checkError(targetIndex);
+        if (error[0] === true) {
+            console.log(error[1]);
+        } else {
+            if (targetIndex < 0) {
+                targetIndex += this.size;
+            }
+            let i = 0;
+            let targetNode = this.head;
+            while (i < targetIndex) {
+                targetNode = targetNode.next;
+                i++;
+            }
+            return targetNode;
         }
-        console.log(targetNode);
-        return targetNode;
     }
 
     // * return index of passed value
     getIndexOf(value) {
-        // ^ errors: value does not exist in list
-        const getIndex = (i, targetValue, node) => {
-            let targetIndex;
-            if (node.data === targetValue) {
-                targetIndex = i;
-            } else {
-                i++;
-                targetIndex = getIndex(i, targetValue, node.next);
+        let doesContain = this.contains(value);
+        if (doesContain === false) {
+            console.log('getIndexOf() ** ERROR: value does not exist **');
+        } else {
+            const getIndex = (i, targetValue, node) => {
+                let targetIndex;
+                if (node.data === targetValue) {
+                    targetIndex = i;
+                } else {
+                    i++;
+                    targetIndex = getIndex(i, targetValue, node.next);
+                }
+                return targetIndex;
             }
+            let targetIndex = getIndex(0, value, this.head);
             return targetIndex;
         }
-        let targetIndex = getIndex(0, value, this.head);
-        console.log(targetIndex);
-        return targetIndex;
     }
 
     // * return true if passed value is contained in list
@@ -89,27 +101,16 @@ class List {
             return contains;
         }
         let contains = checkValue(value, this.head);
-        console.log(contains);
         return contains;
     }
 
     // * append to end of list
     append(value) {
-        // ^ reuse getTail()
-        const getTailNode = () => {
-            let i = 0;
-            let tailNode = this.head;
-            while (i < this.size - 1) {
-                tailNode = tailNode.next;
-                i++;
-            }
-            return tailNode;
-        }
         if (this.head.data === null) {
             this.head.data = value;
             this.size++;
         } else {
-            let tailNode = getTailNode();
+            let tailNode = this.getTail();
             tailNode.next = new Node(value);
             this.size++;
         }
@@ -129,102 +130,128 @@ class List {
     }
 
     // * insert new node at given index
-    insertAt(value, index) {
-        // ^ errors: index out of range, index is not an integer
-        const traverseToTarget = (i, targetIndex, node) => {
-            let previousNode;
-            if (i === targetIndex - 1) {
-                previousNode = node;
+    insertAt(value, targetIndex) {
+        const checkError = (index) => {
+            if (typeof index !== 'number') {
+                return [true, 'insertAt() ** ERROR: index not of type Number **'];
+            } else if (index > this.size) {
+                return [true, 'insertAt() ** ERROR: index out of range **'];
+            } else if (index % 1 !== 0) {
+                return [true, 'insertAt() ** ERROR: index not whole integer **'];
             } else {
-                i++;
-                previousNode = traverseToTarget(i, targetIndex, node.next);
+                return false;
             }
-            return previousNode;
         }
-        let newNode = new Node(value);
-        if (index === 0) {
-            if (this.size === 0) {
-                this.head.data = value;
-            } else {
-                newNode.next = this.head;
-                this.head = newNode;
-            }
-            this.size++;
+        let error = checkError(targetIndex);
+        if (error[0] === true) {
+            console.log(error[1]);
         } else {
-            let previousNode = traverseToTarget(0, index, this.head);
-            newNode.next = previousNode.next;
-            previousNode.next = newNode;
-            this.size++;
+            let newNode = new Node(value);
+            if (targetIndex === 0) {
+                if (this.size === 0) {
+                    this.head.data = value;
+                } else {
+                    newNode.next = this.head;
+                    this.head = newNode;
+                }
+                this.size++;
+            } else {
+                let previousNode = this.getNodeAt(targetIndex - 1);
+                newNode.next = previousNode.next;
+                previousNode.next = newNode;
+                this.size++;
+            }
         }
     }
 
     // * remove node at given index
-    removeAt(index) {
-        // ^ errors: index out of range, index not an integer, head already === null (empty list)
-        const traverseToTarget = (i, targetIndex, node) => {
-            let previousNode;
-            if (i === targetIndex - 1) {
-                previousNode = node;
+    removeAt(targetIndex) {
+        const checkError = (index) => {
+            if (typeof index !== 'number') {
+                return [true, 'removeAt() ** ERROR: index not of type Number **'];
+            } else if (index >= this.size && this.size > 0) {
+                return [true, 'removeAt() ** ERROR: index out of range **'];
+            } else if (index % 1 !== 0) {
+                return [true, 'removeAt() ** ERROR: index not whole integer **'];
+            } else if (this.head.data === null) {
+                return [true, 'removeAt() ** ERROR: no data at head'];
             } else {
-                i++;
-                previousNode = traverseToTarget(i, targetIndex, node.next);
+                return false;
             }
-            return previousNode;
         }
-        if (index === 0) {
-            if (this.size === 1) {
-                this.head.data = null;
-            } else {
-                let newHead = this.head.next;
-                this.head = newHead;
-            }
-            this.size--;
+        let error = checkError(targetIndex);
+        if (error[0] === true) {
+            console.log(error[1]);
         } else {
-            let previousNode = traverseToTarget(0, index, this.head);
-            let newNext = previousNode.next.next;
-            previousNode.next = newNext;
+            if (targetIndex === 0) {
+                if (this.size === 1) {
+                    this.head.data = null;
+                } else {
+                    let newHead = this.head.next;
+                    this.head = newHead;
+                }
+            } else {
+                let previousNode = this.getNodeAt(targetIndex - 1);
+                let newNext = previousNode.next.next;
+                previousNode.next = newNext;
+            }
             this.size--;
         }
     }
 
     // * pop last item from list
     pop() {
-        // ^ errors: head already === null (empty list)
-        let lastNode;
-        const getNextToLast = (node) => {
-            if (node.next.next !== null) {
-                getNextToLast(node.next);
+        const checkError = () => {
+            if (this.head.data === null) {
+                return [true, 'removeAt() ** ERROR: no data at head'];
             } else {
-                lastNode = node.next;
-                node.next = null;
+                return false;
             }
         }
-        if (this.size === 1) {
-            this.head.data = null;
-            lastNode = this.head;
+        let error = checkError();
+        if (error[0] === true) {
+            console.log(error[1]);
         } else {
-            getNextToLast(this.head);
+            let lastNode;
+            if (this.size === 1) {
+                lastNode = new Node(this.head.data);
+                this.head.data = null;
+            } else {
+                let nextToLast = this.getNodeAt(this.size - 2);
+                lastNode = nextToLast.next;
+                nextToLast.next = null;
+            }
+            this.size --;
+            return lastNode;
         }
-        this.size --;
-        return lastNode;
     }
 
     // * shift first item from list
     shift() {
-        // ^ errors: head already === null (empty list)
-        let firstNode;
-        if (this.size === 1) {
-            this.head.data = null;
-            firstNode = this.head;
-        } else {
-            firstNode = new Node(this.head.data);
-            this.head = this.head.next;
+        const checkError = () => {
+            if (this.head.data === null) {
+                return [true, 'removeAt() ** ERROR: no data at head'];
+            } else {
+                return false;
+            }
         }
-        this.size--;
-        return firstNode;
+        let error = checkError();
+        if (error[0] === true) {
+            console.log(error[1]);
+        } else {
+            let firstNode;
+            firstNode = new Node(this.head.data);
+            if (this.size === 1) {
+                this.head.data = null;
+            } else {
+                this.head = this.head.next;
+            }
+            this.size--;
+            return firstNode;
+        }
     }
 
-    // * represent list as a string value ( value ) -> ( value ) -> ( value ) -> null
+    // * represent list as a string value
     print() {
         const appendData = (node) => {
             listString += `( ${node.data} ) -> `;
@@ -244,7 +271,6 @@ class List {
                 i++;
             }
         }
-        console.log(listString);
         return listString;
     }
 }
@@ -255,24 +281,3 @@ class Node {
         this.next = null;
     }
 }
-
-let testList = new List(1);
-
-// testList.getSize();
-// testList.getHead();
-// testList.getTail();
-// testList.contains(-1);
-// testList.getNodeAt(3);
-// testList.getIndexOf(6);
-
-// testList.append(6);
-// testList.prepend(0);
-// testList.insertAt(2.5, 2);
-// testList.removeAt(0);
-// let lastNode = testList.pop();
-// console.log(lastNode);
-// let firstNode = testList.shift();
-// console.log(firstNode);
-
-testList.print();
-console.log(testList);
