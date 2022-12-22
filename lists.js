@@ -1,3 +1,10 @@
+class Node {
+    constructor(value = null) {
+        this.data = value;
+        this.next = null;
+    }
+}
+
 class List {
     // container for the list itself
     constructor(head, ...data) {
@@ -272,12 +279,5 @@ class List {
             }
         }
         return listString;
-    }
-}
-
-class Node {
-    constructor(value = null) {
-        this.data = value;
-        this.next = null;
     }
 }
