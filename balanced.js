@@ -11,6 +11,20 @@ function buildTree(array) {
             this.root = node;
         }
 
+        insert(value, node = this.root) {
+            if (node === null) {
+                node = new Node(value);
+                return node;
+            } else {
+                if (value < node.data) {
+                    node.left = this.insert(value, node.left);
+                } else if (value > node.data) {
+                    node.right = this.insert(value, node.right);
+                }
+            }
+            return node;
+        }
+
         printTree(node = this.root, prefix = '', isLeft = true) {
             if (node.right !== null) {
                 this.printTree(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
@@ -69,10 +83,13 @@ function buildTree(array) {
     let list = makeNodeList(array, 0, array.length - 1);
     let tree = new Tree(list);
     return tree;
-
 }
 
 testArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 let testTree = buildTree(testArray);
+testTree.insert(0);
+testTree.insert(7000);
+testTree.insert(200);
+testTree.insert(4.5);
 console.log(testTree);
 testTree.printTree();
