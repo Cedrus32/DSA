@@ -25,6 +25,35 @@ function buildTree(array) {
             return node;
         }
 
+        delete(value, node = this.root) {
+            const findNextBiggest = (node) => {
+                let minValue = node.data;
+                while (node.left != null) {
+                    minValue = node.left.data;
+                    node = node.left;
+                }
+                return minValue;
+            }
+
+            if (node === null) {
+                return null;
+            } else if (value < node.data) {
+                node.left = this.delete(value, node.left);
+            } else if (value > node.data) {
+                node.right = this.delete(value, node.right);
+            } else if (value === node.data) {
+                if (node.left === null) {
+                    return node.right;
+                } else if (node.right === null) {
+                    return node.left;
+                } else {
+                    node.data = findNextBiggest(node.right);
+                    node.right = this.delete(node.data, node.right);
+                }
+            }
+            return node;
+        }
+
         printTree(node = this.root, prefix = '', isLeft = true) {
             if (node.right !== null) {
                 this.printTree(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
@@ -91,5 +120,10 @@ testTree.insert(0);
 testTree.insert(7000);
 testTree.insert(200);
 testTree.insert(4.5);
+testTree.delete(0);
+testTree.delete(9);
+testTree.delete(1);
+testTree.delete(4);
+testTree.delete(324);
 console.log(testTree);
 testTree.printTree();
