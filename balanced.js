@@ -11,7 +11,7 @@ function buildTree(array) {
             this.root = node;
         }
 
-        printTree(node, prefix = '', isLeft = true) {
+        printTree(node = this.root, prefix = '', isLeft = true) {
             if (node.right !== null) {
                 this.printTree(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
             }
@@ -75,4 +75,4 @@ function buildTree(array) {
 testArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 let testTree = buildTree(testArray);
 console.log(testTree);
-testTree.printTree(testTree.root);
+testTree.printTree();
