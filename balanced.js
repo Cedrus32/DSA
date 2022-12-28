@@ -11,7 +11,51 @@ function buildTree(array) {
             this.root = node;
         }
 
+        // levelOrder() {
+            
+        // }
+        // preOrder() {
+
+        // }
+        // inOrder() {
+
+        // }
+        // postOrder() {
+
+        // }
+        getHeight(node = this.root) {
+            if (node === null) {
+                return 0;
+            } else {
+                let lh = this.getHeight(node.left);
+                let rh = this.getHeight(node.right);
+                if (lh > rh) {
+                    return lh + 1;
+                } else {
+                    return rh + 1;
+                }
+            }
+        }
+        getDepth(value, node = this.root) {
+            // depth === # edges from root from root to provided node
+            this.checkForValue(value);
+            let depth;
+            if (node === null) {
+                depth = 'value not found';
+            }
+            if (node.data === value) {
+                return 0;
+            } else {
+                if (value < node.data) {
+                    depth = this.getDepth(value, node.left) + 1;
+                } else if (value > node.data) {
+                    depth = this.getDepth(value, node.right) + 1;
+                }
+            }
+            return depth;
+        }
         insert(value, node = this.root) {
+            this.checkForValue(value);
             if (node === null) {
                 node = new Node(value);
                 return node;
@@ -24,17 +68,8 @@ function buildTree(array) {
             }
             return node;
         }
-
         delete(value, node = this.root) {
-            const findNextBiggest = (node) => {
-                let minValue = node.data;
-                while (node.left != null) {
-                    minValue = node.left.data;
-                    node = node.left;
-                }
-                return minValue;
-            }
-
+            this.checkForValue(value);
             if (node === null) {
                 return null;
             } else if (value < node.data) {
@@ -47,13 +82,44 @@ function buildTree(array) {
                 } else if (node.right === null) {
                     return node.left;
                 } else {
-                    node.data = findNextBiggest(node.right);
+                    node.data = this.findNextBiggest(node.right);
                     node.right = this.delete(node.data, node.right);
                 }
             }
             return node;
         }
-
+        findValue(value, node = this.root) {
+            this.checkForValue(value);
+            let targetNode;
+            if (node === null) {
+                targetNode = 'value not found';
+            } else if (value === node.data) {
+                return node;
+            } else {
+                if (value < node.data) {
+                    targetNode = this.findValue(value, node.left);
+                } else if (value > node.data) {
+                    targetNode = this.findValue(value, node.right);
+                }
+            }
+            return targetNode;
+        }
+        findNextBiggest(root) { // ! revisit -- check node.left vs node.right
+            let minValue = root.data;
+            while (root.left !== null) {
+                minValue = root.left.data;
+                root = root.left;
+            }
+            return minValue;
+        }
+        findNextSmallest(root) {    // ! make to compliment findNextBiggest()
+            let minValue = root.data;
+            while (root.left !== null) {
+                minValue = root.left.data;
+                root = root.left;
+            }
+            return minValue;
+        }
         printTree(node = this.root, prefix = '', isLeft = true) {
             if (node.right !== null) {
                 this.printTree(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
@@ -61,6 +127,12 @@ function buildTree(array) {
             console.log(`${prefix}${isLeft ? '└── ' : '┌── '}${node.data}`);
             if (node.left !== null) {
                 this.printTree(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
+            }
+        }
+        checkForValue(value) {
+            if (value === undefined) {
+                console.log('no value provided');
+                return;
             }
         }
     }
@@ -114,16 +186,9 @@ function buildTree(array) {
     return tree;
 }
 
-testArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
+let testArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 let testTree = buildTree(testArray);
-testTree.insert(0);
-testTree.insert(7000);
-testTree.insert(200);
-testTree.insert(4.5);
-testTree.delete(0);
-testTree.delete(9);
-testTree.delete(1);
-testTree.delete(4);
-testTree.delete(324);
 console.log(testTree);
 testTree.printTree();
+let nextBiggest = testTree.findNextBiggest();
+console.log(nextBiggest);
