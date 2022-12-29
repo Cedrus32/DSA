@@ -11,6 +11,16 @@ function buildTree(array) {
             this.root = node;
         }
 
+        isBalanced() {
+            let leftHeight = this.getHeight(this.root.left);
+            let rightHeight = this.getHeight(this.root.right);
+            let difference = leftHeight - rightHeight;
+            if (difference >= -1 && difference <= 1) {
+                return true;
+            } else {
+                return false;
+            }
+        }
         levelOrder(node = this.root) {
             let queue = [];
             let array = [];
@@ -88,7 +98,7 @@ function buildTree(array) {
             }
             return depth;
         }
-        insert(value, node = this.root) {
+        insert(value, node = this.root) {   // todo: allow multiple values
             this.checkForInputError(value);
             if (node === null) {
                 node = new Node(value);
@@ -102,7 +112,7 @@ function buildTree(array) {
             }
             return node;
         }
-        delete(value, node = this.root) {
+        delete(value, node = this.root) {   // todo: allow multiple values
             this.checkForInputError(value);
             if (node === null) {
                 return null;
@@ -216,8 +226,13 @@ function buildTree(array) {
 // ----------- ----------- ----------- ----------- ----------- -----------
 let testArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 let testTree = buildTree(testArray);
+testTree.delete(1);
+testTree.delete(3);
+testTree.delete(4);
+testTree.delete(5);
+testTree.delete(7);
 console.log(testTree);
 testTree.printTree();
 // ----------- ----------- ----------- ----------- ----------- -----------
-let orderedArray = testTree.postOrder();
-console.log(orderedArray);
+let test = testTree.isBalanced();
+console.log(test);
