@@ -17,7 +17,7 @@ function buildTree(array) {
             queue.push(node);
             while (queue.length !== 0) {
                 let childNode = queue.shift();
-                array.push (childNode.data);
+                array.push(childNode.data);
                 if (childNode.left !== null) {
                     queue.push(childNode.left);
                 }
@@ -27,15 +27,36 @@ function buildTree(array) {
             }
             return array;
         }
-        // preOrder() {
-
-        // }
-        // inOrder() {
-
-        // }
-        // postOrder() {
-
-        // }
+        preOrder(node = this.root, array = []) {
+            if (node === null) {
+                return;
+            } else {
+                array.push(node.data);
+                this.preOrder(node.left, array);
+                this.preOrder(node.right, array);
+            }
+            return array;
+        }
+        inOrder(node = this.root, array = []) {
+            if (node === null) {
+                return;
+            } else {
+                this.inOrder(node.left, array);
+                array.push(node.data);
+                this.inOrder(node.right, array);
+            }
+            return array;
+        }
+        postOrder(node = this.root, array = []) {
+            if (node === null) {
+                return;
+            } else {
+                this.postOrder(node.left, array);
+                this.postOrder(node.right, array);
+                array.push(node.data);
+            }
+            return array;
+        }
         getHeight(node = this.root) {
             if (node === null) {
                 return 0;
@@ -198,5 +219,5 @@ let testTree = buildTree(testArray);
 console.log(testTree);
 testTree.printTree();
 // ----------- ----------- ----------- ----------- ----------- -----------
-let levelOrderArray = testTree.levelOrder();
-console.log(levelOrderArray);
+let orderedArray = testTree.postOrder();
+console.log(orderedArray);
