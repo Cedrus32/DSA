@@ -11,9 +11,22 @@ function buildTree(array) {
             this.root = node;
         }
 
-        // levelOrder() {
-
-        // }
+        levelOrder(node = this.root) {
+            let queue = [];
+            let array = [];
+            queue.push(node);
+            while (queue.length !== 0) {
+                let childNode = queue.shift();
+                array.push (childNode.data);
+                if (childNode.left !== null) {
+                    queue.push(childNode.left);
+                }
+                if (childNode.right !== null) {
+                    queue.push(childNode.right);
+                }
+            }
+            return array;
+        }
         // preOrder() {
 
         // }
@@ -179,7 +192,11 @@ function buildTree(array) {
     return tree;
 }
 
+// ----------- ----------- ----------- ----------- ----------- -----------
 let testArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 let testTree = buildTree(testArray);
 console.log(testTree);
 testTree.printTree();
+// ----------- ----------- ----------- ----------- ----------- -----------
+let levelOrderArray = testTree.levelOrder();
+console.log(levelOrderArray);
