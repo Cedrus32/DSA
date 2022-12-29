@@ -12,7 +12,7 @@ function buildTree(array) {
         }
 
         // levelOrder() {
-            
+
         // }
         // preOrder() {
 
@@ -38,7 +38,7 @@ function buildTree(array) {
         }
         getDepth(value, node = this.root) {
             // depth === # edges from root from root to provided node
-            this.checkForValue(value);
+            this.scrubValueInput(value);
             let depth;
             if (node === null) {
                 depth = 'value not found';
@@ -55,7 +55,7 @@ function buildTree(array) {
             return depth;
         }
         insert(value, node = this.root) {
-            this.checkForValue(value);
+            this.scrubValueInput(value);
             if (node === null) {
                 node = new Node(value);
                 return node;
@@ -69,7 +69,7 @@ function buildTree(array) {
             return node;
         }
         delete(value, node = this.root) {
-            this.checkForValue(value);
+            this.scrubValueInput(value);
             if (node === null) {
                 return null;
             } else if (value < node.data) {
@@ -89,7 +89,7 @@ function buildTree(array) {
             return node;
         }
         findValue(value, node = this.root) {
-            this.checkForValue(value);
+            this.scrubValueInput(value);
             let targetNode;
             if (node === null) {
                 targetNode = 'value not found';
@@ -129,7 +129,7 @@ function buildTree(array) {
                 this.printTree(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
             }
         }
-        checkForValue(value) {
+        scrubValueInput(value) {
             if (value === undefined) {
                 console.log('no value provided');
                 return;
@@ -190,5 +190,5 @@ let testArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 let testTree = buildTree(testArray);
 console.log(testTree);
 testTree.printTree();
-let nextBiggest = testTree.findNextBiggest();
+let nextBiggest = testTree.findNextBiggest(8);
 console.log(nextBiggest);
