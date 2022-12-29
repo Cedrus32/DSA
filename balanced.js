@@ -38,7 +38,7 @@ function buildTree(array) {
         }
         getDepth(value, node = this.root) {
             // depth === # edges from root from root to provided node
-            this.scrubValueInput(value);
+            this.checkForInputError(value);
             let depth;
             if (node === null) {
                 depth = 'value not found';
@@ -55,7 +55,7 @@ function buildTree(array) {
             return depth;
         }
         insert(value, node = this.root) {
-            this.scrubValueInput(value);
+            this.checkForInputError(value);
             if (node === null) {
                 node = new Node(value);
                 return node;
@@ -69,7 +69,7 @@ function buildTree(array) {
             return node;
         }
         delete(value, node = this.root) {
-            this.scrubValueInput(value);
+            this.checkForInputError(value);
             if (node === null) {
                 return null;
             } else if (value < node.data) {
@@ -82,14 +82,14 @@ function buildTree(array) {
                 } else if (node.right === null) {
                     return node.left;
                 } else {
-                    node.data = this.findNextBiggest(node.right);
+                    node.data = this.findNextBiggest(node);
                     node.right = this.delete(node.data, node.right);
                 }
             }
             return node;
         }
         findValue(value, node = this.root) {
-            this.scrubValueInput(value);
+            this.checkForInputError(value);
             let targetNode;
             if (node === null) {
                 targetNode = 'value not found';
@@ -104,19 +104,12 @@ function buildTree(array) {
             }
             return targetNode;
         }
-        findNextBiggest(root) { // ! revisit -- check node.left vs node.right
-            let minValue = root.data;
-            while (root.left !== null) {
-                minValue = root.left.data;
-                root = root.left;
-            }
-            return minValue;
-        }
-        findNextSmallest(root) {    // ! make to compliment findNextBiggest()
-            let minValue = root.data;
-            while (root.left !== null) {
-                minValue = root.left.data;
-                root = root.left;
+        findNextBiggest(node) {
+            node = node.right
+            let minValue = node.data;
+            while (node.left !== null) {
+                minValue = node.left.data;
+                node = node.left;
             }
             return minValue;
         }
@@ -129,7 +122,7 @@ function buildTree(array) {
                 this.printTree(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
             }
         }
-        scrubValueInput(value) {
+        checkForInputError(value) {
             if (value === undefined) {
                 console.log('no value provided');
                 return;
@@ -190,5 +183,3 @@ let testArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 let testTree = buildTree(testArray);
 console.log(testTree);
 testTree.printTree();
-let nextBiggest = testTree.findNextBiggest(8);
-console.log(nextBiggest);
