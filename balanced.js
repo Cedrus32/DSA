@@ -21,6 +21,13 @@ function buildTree(array) {
                 return false;
             }
         }
+        rebalance() {
+            let orderedArray = this.inOrder();
+            console.log(orderedArray);
+            let newList = makeNodeList(orderedArray, 0, orderedArray.length - 1);
+            console.log(newList);
+            this.root = newList;
+        }
         levelOrder(node = this.root) {
             let queue = [];
             let array = [];
@@ -234,5 +241,6 @@ testTree.delete(7);
 console.log(testTree);
 testTree.printTree();
 // ----------- ----------- ----------- ----------- ----------- -----------
-let test = testTree.isBalanced();
-console.log(test);
+testTree.rebalance();
+console.log(testTree);
+testTree.printTree();
