@@ -22,10 +22,9 @@ function buildTree(array) {
             }
         }
         rebalance() {
-            let orderedArray = this.inOrder();
-            console.log(orderedArray);
-            let newList = makeNodeList(orderedArray, 0, orderedArray.length - 1);
-            console.log(newList);
+            let newArray = this.inOrder();
+            newArray = removeDuplicates(newArray);
+            let newList = makeNodeList(newArray, 0, newArray.length - 1);
             this.root = newList;
         }
         levelOrder(node = this.root) {
@@ -105,7 +104,7 @@ function buildTree(array) {
             }
             return depth;
         }
-        insert(value, node = this.root) {   // todo: allow multiple values
+        insert(value, node = this.root) {
             this.checkForInputError(value);
             if (node === null) {
                 node = new Node(value);
@@ -119,7 +118,7 @@ function buildTree(array) {
             }
             return node;
         }
-        delete(value, node = this.root) {   // todo: allow multiple values
+        delete(value, node = this.root) {
             this.checkForInputError(value);
             if (node === null) {
                 return null;
@@ -230,17 +229,47 @@ function buildTree(array) {
     return tree;
 }
 
+function automate() {
+    // create
+    let testArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
+    let testTree = buildTree(testArray);
+    console.log(testTree);
+    console.log(`balanced?: ${testTree.isBalanced()}`);
+    testTree.printTree();
+
+    // traverse
+    let levelOrder = testTree.levelOrder();
+    console.log(`level order: [${levelOrder}]`);
+    let preOrder = testTree.preOrder();
+    console.log(`pre order: [${preOrder}]`);
+    let inOrder = testTree.inOrder();
+    console.log(`in order: [${inOrder}]`);
+    let postOrder = testTree.postOrder();
+    console.log(`post order: [${postOrder}]`);
+
+    // add data
+    for (let i = 200; i < 210; i++) {
+        testTree.insert(i);
+    }
+    console.log(testTree);
+    console.log(`balanced?: ${testTree.isBalanced()}`);
+    testTree.printTree();
+
+    // rebalance
+    testTree.rebalance();
+    console.log(`balanced?: ${testTree.isBalanced()}`);
+    testTree.printTree();
+
+    // traverse
+    levelOrder = testTree.levelOrder();
+    console.log(`level order: [${levelOrder}]`);
+    preOrder = testTree.preOrder();
+    console.log(`pre order: [${preOrder}]`);
+    inOrder = testTree.inOrder();
+    console.log(`in order: [${inOrder}]`);
+    postOrder = testTree.postOrder();
+    console.log(`post order: [${postOrder}]`);
+}
+
 // ----------- ----------- ----------- ----------- ----------- -----------
-let testArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
-let testTree = buildTree(testArray);
-testTree.delete(1);
-testTree.delete(3);
-testTree.delete(4);
-testTree.delete(5);
-testTree.delete(7);
-console.log(testTree);
-testTree.printTree();
-// ----------- ----------- ----------- ----------- ----------- -----------
-testTree.rebalance();
-console.log(testTree);
-testTree.printTree();
+automate();
