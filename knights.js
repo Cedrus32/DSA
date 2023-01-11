@@ -188,6 +188,18 @@ function getNextMoves(coord, gameboard) {
     return moves;
 }
 
+function formatPath(pathList) {
+    let coordArray = [];
+    let step = pathList.step;
+    while (step >= 0) {
+        coordArray.splice(0, 0, pathList.coord);
+        pathList = pathList.previous;
+        step--;
+    }
+    let path = '[' + coordArray.join('], [') + ']';
+    return path;
+}
+
 function findShortestPath(startCoord, endCoord) {
     let _Gameboard = buildGameboard(8);
     let _Knight = buildKnight();
@@ -199,20 +211,18 @@ function findShortestPath(startCoord, endCoord) {
     // traverse queue
     while (queue.length !== 0) {
         let currentMove = queue.shift();
-        console.log(currentMove);
         // check current move
         if (currentMove.coord[0] === endCoord[0] && currentMove.coord[1] === endCoord[1]) {
-            _Knight.path = currentMove;
-            _Knight.steps = currentMove.step;
+            _Knight.path = currentMove; // redundant, maybe needed when implementing UI?
+            _Knight.steps = currentMove.step; // redundant, maybe needed when implementing UI?
+            let path = formatPath(_Knight.path);
             console.log(`*** You reached the end in ${_Knight.steps} steps. Here is your path:`)
-            console.log(_Knight.path);
+            console.log(path);
             queue = [];
             return;
         // go to next moves
         } else {
             let nextMoves = getNextMoves(currentMove.coord, _Gameboard);
-            console.log(currentMove.step + 1);
-            console.log(nextMoves);
             nextMoves.forEach(move => {
                 queue.push(generateMove(move, currentMove, currentMove.step + 1));
             });
